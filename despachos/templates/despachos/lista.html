@@ -1,0 +1,76 @@
+{% extends "despachos/base.html" %}
+{% block title %}Despachos{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h2 class="fw-bold mb-0">Despachos</h2>
+  <a href="{% url 'despachos:crear' %}" class="btn btn-primary">
+    <i class="bi bi-plus-lg me-1"></i>Nuevo Despacho
+  </a>
+</div>
+
+<!-- Filtros -->
+<div class="card mb-4">
+  <div class="card-body">
+    <form method="get" class="row g-3">
+      <div class="col-md-4">{{ form.buscar }}</div>
+      <div class="col-md-2">{{ form.estado }}</div>
+      <div class="col-md-2">{{ form.fecha_desde }}</div>
+      <div class="col-md-2">{{ form.fecha_hasta }}</div>
+      <div class="col-md-2 d-flex gap-2">
+        <button type="submit" class="btn btn-outline-primary flex-grow-1">
+          <i class="bi bi-search"></i> Filtrar
+        </button>
+        <a href="{% url 'despachos:lista' %}" class="btn btn-outline-secondary">
+          <i class="bi bi-x-lg"></i>
+        </a>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table table-hover mb-0">
+        <thead class="table-light">
+          <tr>
+            <th>Número</th><th>Fecha</th><th>Origen</th><th>Destino</th>
+            <th>Destinatario</th><th>Peso (kg)</th><th>Transportista</th>
+            <th>Estado</th><th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for d in despachos %}
+          <tr>
+            <td class="fw-semibold">{{ d.numero }}</td>
+            <td>{{ d.fecha_despacho|date:"d/m/Y" }}</td>
+            <td>{{ d.origen }}</td>
+            <td>{{ d.destino }}</td>
+            <td>{{ d.destinatario }}</td>
+            <td>{{ d.peso_kg }}</td>
+            <td>{{ d.transportista|default:"—" }}</td>
+            <td><span class="badge bg-{{ d.estado_color }}">{{ d.get_estado_display }}</span></td>
+            <td>
+              <a href="{% url 'despachos:detalle' d.pk %}" class="btn btn-sm btn-outline-primary me-1">
+                <i class="bi bi-eye"></i>
+              </a>
+              <a href="{% url 'despachos:editar' d.pk %}" class="btn btn-sm btn-outline-secondary me-1">
+                <i class="bi bi-pencil"></i>
+              </a>
+              <a href="{% url 'despachos:eliminar' d.pk %}" class="btn btn-sm btn-outline-danger">
+                <i class="bi bi-trash"></i>
+              </a>
+            </td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="9" class="text-center text-muted py-4">No se encontraron despachos.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="card-footer text-muted small">
+    {{ despachos|length }} registro(s) encontrado(s)
+  </div>
+</div>
+{% endblock %}

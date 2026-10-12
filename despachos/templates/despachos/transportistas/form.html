@@ -1,0 +1,37 @@
+{% extends "despachos/base.html" %}
+{% block title %}{{ titulo }}{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h2 class="fw-bold mb-0">{{ titulo }}</h2>
+  <a href="{% url 'despachos:transportistas' %}" class="btn btn-outline-secondary">
+    <i class="bi bi-arrow-left me-1"></i>Volver
+  </a>
+</div>
+<div class="card" style="max-width:550px">
+  <div class="card-body">
+    <form method="post">
+      {% csrf_token %}
+      <div class="row g-3">
+        <div class="col-12">
+          <label class="form-label fw-semibold">Nombre *</label>{{ form.nombre }}
+        </div>
+        <div class="col-12">
+          <label class="form-label fw-semibold">Identificación *</label>{{ form.identificacion }}
+        </div>
+        <div class="col-sm-6">
+          <label class="form-label fw-semibold">Teléfono</label>{{ form.telefono }}
+        </div>
+        <div class="col-sm-6">
+          <label class="form-label fw-semibold">Email</label>{{ form.email }}
+        </div>
+        <div class="col-12">
+          <div class="form-check">{{ form.activo }} <label class="form-check-label">Activo</label></div>
+        </div>
+        <div class="col-12 pt-2">
+          <button type="submit" class="btn btn-primary px-4"><i class="bi bi-check-lg me-1"></i>Guardar</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

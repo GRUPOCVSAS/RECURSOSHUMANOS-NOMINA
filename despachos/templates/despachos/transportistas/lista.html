@@ -1,0 +1,38 @@
+{% extends "despachos/base.html" %}
+{% block title %}Transportistas{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h2 class="fw-bold mb-0">Transportistas</h2>
+  <a href="{% url 'despachos:crear_transportista' %}" class="btn btn-primary">
+    <i class="bi bi-plus-lg me-1"></i>Nuevo
+  </a>
+</div>
+<div class="card">
+  <div class="card-body p-0">
+    <table class="table table-hover mb-0">
+      <thead class="table-light">
+        <tr><th>Nombre</th><th>Identificación</th><th>Teléfono</th><th>Email</th><th>Despachos</th><th>Activo</th><th>Acciones</th></tr>
+      </thead>
+      <tbody>
+        {% for t in transportistas %}
+        <tr>
+          <td class="fw-semibold">{{ t.nombre }}</td>
+          <td>{{ t.identificacion }}</td>
+          <td>{{ t.telefono|default:"—" }}</td>
+          <td>{{ t.email|default:"—" }}</td>
+          <td>{{ t.total_despachos }}</td>
+          <td>{% if t.activo %}<span class="badge bg-success">Sí</span>{% else %}<span class="badge bg-secondary">No</span>{% endif %}</td>
+          <td>
+            <a href="{% url 'despachos:editar_transportista' t.pk %}" class="btn btn-sm btn-outline-secondary">
+              <i class="bi bi-pencil"></i>
+            </a>
+          </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="7" class="text-center text-muted py-4">No hay transportistas.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

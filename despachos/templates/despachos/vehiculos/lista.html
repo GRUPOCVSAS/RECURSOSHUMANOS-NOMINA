@@ -1,0 +1,38 @@
+{% extends "despachos/base.html" %}
+{% block title %}Vehículos{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h2 class="fw-bold mb-0">Vehículos</h2>
+  <a href="{% url 'despachos:crear_vehiculo' %}" class="btn btn-primary">
+    <i class="bi bi-plus-lg me-1"></i>Nuevo
+  </a>
+</div>
+<div class="card">
+  <div class="card-body p-0">
+    <table class="table table-hover mb-0">
+      <thead class="table-light">
+        <tr><th>Placa</th><th>Marca/Modelo</th><th>Capacidad</th><th>Transportista</th><th>Despachos</th><th>Activo</th><th>Acciones</th></tr>
+      </thead>
+      <tbody>
+        {% for v in vehiculos %}
+        <tr>
+          <td class="fw-semibold">{{ v.placa }}</td>
+          <td>{{ v.marca }} {{ v.modelo }}</td>
+          <td>{{ v.capacidad_kg }} kg</td>
+          <td>{{ v.transportista|default:"—" }}</td>
+          <td>{{ v.total_despachos }}</td>
+          <td>{% if v.activo %}<span class="badge bg-success">Sí</span>{% else %}<span class="badge bg-secondary">No</span>{% endif %}</td>
+          <td>
+            <a href="{% url 'despachos:editar_vehiculo' v.pk %}" class="btn btn-sm btn-outline-secondary">
+              <i class="bi bi-pencil"></i>
+            </a>
+          </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="7" class="text-center text-muted py-4">No hay vehículos.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
