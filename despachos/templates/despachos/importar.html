@@ -1,0 +1,58 @@
+{% extends "despachos/base.html" %}
+{% block title %}Importar Excel{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h2 class="fw-bold mb-0">Importar Excel de Ventas</h2>
+  <a href="{% url 'despachos:lista' %}" class="btn btn-outline-secondary">
+    <i class="bi bi-arrow-left me-1"></i>Volver
+  </a>
+</div>
+
+<div class="row">
+  <div class="col-lg-6">
+    <div class="card mb-4">
+      <div class="card-body">
+        <form method="post" enctype="multipart/form-data">
+          {% csrf_token %}
+          <label class="form-label fw-semibold">Selecciona el archivo Excel</label>
+          {{ form.archivo }}
+          <div class="mt-3">
+            <button type="submit" class="btn btn-success px-4">
+              <i class="bi bi-upload me-2"></i>Importar
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header bg-white fw-semibold">
+        <i class="bi bi-info-circle me-2 text-info"></i>Columnas esperadas
+      </div>
+      <div class="card-body">
+        <ul class="list-unstyled small mb-0">
+          <li><code>Cliente</code> — Nombre del destinatario</li>
+          <li><code>Celular</code></li>
+          <li><code>Cédula</code></li>
+          <li><code>Contrato</code> — Número único del despacho</li>
+          <li><code>Dirección</code></li>
+          <li><code>Zona</code></li>
+          <li><code>Vendedor1</code></li>
+          <li><code>Vendedor2</code></li>
+          <li><code>Coordinador</code></li>
+          <li><code>Mensajero</code> — Se crea automáticamente</li>
+          <li><code>Productos</code></li>
+          <li><code>Total</code> — Valor de la venta</li>
+          <li><code>Saldo</code> — Pendiente de cobro</li>
+          <li><code>Fecha de venta</code></li>
+          <li><code>Fecha de pago</code></li>
+          <li><code>Estado</code> — PLANILLAS o REVENTAS</li>
+        </ul>
+        <div class="alert alert-info mt-3 small mb-0">
+          Los contratos ya existentes se omiten automáticamente.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

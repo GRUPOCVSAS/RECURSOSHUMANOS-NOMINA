@@ -1,67 +1,123 @@
 {% extends "despachos/base.html" %}
-{% block title %}Despacho {{ despacho.numero }}{% endblock %}
+{% block title %}{{ despacho.numero }} - {{ despacho.destinatario }}{% endblock %}
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-4">
   <div>
-    <h2 class="fw-bold mb-0">Despacho {{ despacho.numero }}</h2>
-    <span class="badge bg-{{ despacho.estado_color }} fs-6 mt-1">{{ despacho.get_estado_display }}</span>
+    <h2 class="fw-bold mb-0">{{ despacho.numero }}</h2>
+    <div class="d-flex gap-2 mt-1 align-items-center">
+      <span class="badge bg-{{ despacho.estado_color }}">{{ despacho.get_estado_display }}</span>
+      <span class="badge bg-secondary">{{ despacho.get_tipo_display }}</span>
+    </div>
   </div>
   <div class="d-flex gap-2">
-    <a href="{% url 'despachos:editar' despacho.pk %}" class="btn btn-outline-secondary">
+    <a href="{% url 'despachos:editar' despacho.pk %}" class="btn btn-outline-secondary btn-sm">
       <i class="bi bi-pencil me-1"></i>Editar
     </a>
-    <a href="{% url 'despachos:lista' %}" class="btn btn-outline-primary">
+    <a href="{% url 'despachos:lista' %}" class="btn btn-outline-primary btn-sm">
       <i class="bi bi-arrow-left me-1"></i>Volver
     </a>
   </div>
 </div>
 
 <div class="row g-4">
-  <!-- Info principal -->
+  <!-- Columna principal -->
   <div class="col-lg-8">
-    <div class="card mb-4">
-      <div class="card-header bg-white"><h5 class="mb-0">Información del Despacho</h5></div>
-      <div class="card-body">
-        <div class="row g-3">
-          <div class="col-sm-6">
-            <label class="text-muted small">Fecha de Despacho</label>
-            <div class="fw-semibold">{{ despacho.fecha_despacho|date:"d/m/Y" }}</div>
+
+    <!-- Resumen financiero -->
+    <div class="row g-3 mb-4">
+      <div class="col-4">
+        <div class="card p-3 text-center border-primary">
+          <div class="text-muted small">Total Venta</div>
+          <div class="fs-5 fw-bold text-primary">${{ despacho.valor_venta|floatformat:0 }}</div>
+        </div>
+      </div>
+      <div class="col-4">
+        <div class="card p-3 text-center border-success">
+          <div class="text-muted small">Cobrado</div>
+          <div class="fs-5 fw-bold text-success">${{ despacho.cobrado|floatformat:0 }}</div>
+        </div>
+      </div>
+      <div class="col-4">
+        <div class="card p-3 text-center {% if despacho.saldo > 0 %}border-danger{% else %}border-success{% endif %}">
+          <div class="text-muted small">Saldo</div>
+          <div class="fs-5 fw-bold {% if despacho.saldo > 0 %}text-danger{% else %}text-success{% endif %}">
+            ${{ despacho.saldo|floatformat:0 }}
           </div>
-          <div class="col-sm-6">
-            <label class="text-muted small">Peso (kg)</label>
-            <div class="fw-semibold">{{ despacho.peso_kg }} kg</div>
-          </div>
-          <div class="col-sm-6">
-            <label class="text-muted small">Origen</label>
-            <div class="fw-semibold">{{ despacho.origen }}</div>
-          </div>
-          <div class="col-sm-6">
-            <label class="text-muted small">Destino</label>
-            <div class="fw-semibold">{{ despacho.destino }}</div>
-          </div>
-          <div class="col-12">
-            <label class="text-muted small">Destinatario</label>
-            <div class="fw-semibold">{{ despacho.destinatario }}</div>
-          </div>
-          {% if despacho.descripcion %}
-          <div class="col-12">
-            <label class="text-muted small">Descripción</label>
-            <div>{{ despacho.descripcion }}</div>
-          </div>
-          {% endif %}
-          {% if despacho.notas %}
-          <div class="col-12">
-            <label class="text-muted small">Notas</label>
-            <div>{{ despacho.notas }}</div>
-          </div>
-          {% endif %}
         </div>
       </div>
     </div>
 
+    <!-- Datos del cliente -->
+    <div class="card mb-4">
+      <div class="card-header bg-white fw-semibold">
+        <i class="bi bi-person me-2 text-primary"></i>Cliente
+      </div>
+      <div class="card-body">
+        <div class="row g-3">
+          <div class="col-sm-6">
+            <div class="text-muted small">Nombre</div>
+            <div class="fw-semibold">{{ despacho.destinatario }}</div>
+          </div>
+          <div class="col-sm-3">
+            <div class="text-muted small">Cédula</div>
+            <div>{{ despacho.cedula|default:"—" }}</div>
+          </div>
+          <div class="col-sm-3">
+            <div class="text-muted small">Celular</div>
+            <div>{{ despacho.celular|default:"—" }}</div>
+          </div>
+          <div class="col-sm-8">
+            <div class="text-muted small">Dirección</div>
+            <div>{{ despacho.destino }}</div>
+          </div>
+          <div class="col-sm-4">
+            <div class="text-muted small">Zona</div>
+            <div>{{ despacho.zona|default:"—" }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Comercial -->
+    <div class="card mb-4">
+      <div class="card-header bg-white fw-semibold">
+        <i class="bi bi-briefcase me-2 text-success"></i>Comercial
+      </div>
+      <div class="card-body">
+        <div class="row g-3">
+          <div class="col-sm-5">
+            <div class="text-muted small">Vendedor 1</div>
+            <div>{{ despacho.vendedor1|default:"—" }}</div>
+          </div>
+          <div class="col-sm-4">
+            <div class="text-muted small">Vendedor 2</div>
+            <div>{{ despacho.vendedor2|default:"SIN ASESOR" }}</div>
+          </div>
+          <div class="col-sm-3">
+            <div class="text-muted small">Coordinador</div>
+            <div>{{ despacho.coordinador_nombre|default:"—" }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Productos -->
+    {% if despacho.productos_detalle %}
+    <div class="card mb-4">
+      <div class="card-header bg-white fw-semibold">
+        <i class="bi bi-bag me-2 text-warning"></i>Productos
+      </div>
+      <div class="card-body">
+        <p class="mb-0">{{ despacho.productos_detalle }}</p>
+      </div>
+    </div>
+    {% endif %}
+
     <!-- Seguimiento -->
     <div class="card mb-4">
-      <div class="card-header bg-white"><h5 class="mb-0">Registrar Seguimiento</h5></div>
+      <div class="card-header bg-white fw-semibold">
+        <i class="bi bi-plus-circle me-2"></i>Registrar Seguimiento
+      </div>
       <div class="card-body">
         <form method="post">
           {% csrf_token %}
@@ -75,8 +131,8 @@
               {{ seguimiento_form.observacion }}
             </div>
             <div class="col-12">
-              <button type="submit" class="btn btn-primary">
-                <i class="bi bi-plus-lg me-1"></i>Registrar
+              <button type="submit" class="btn btn-primary btn-sm">
+                <i class="bi bi-check-lg me-1"></i>Registrar
               </button>
             </div>
           </div>
@@ -86,57 +142,62 @@
 
     <!-- Historial -->
     <div class="card">
-      <div class="card-header bg-white"><h5 class="mb-0">Historial de Seguimiento</h5></div>
+      <div class="card-header bg-white fw-semibold">
+        <i class="bi bi-clock-history me-2"></i>Historial
+      </div>
       <div class="list-group list-group-flush">
         {% for seg in despacho.seguimientos.all %}
         <div class="list-group-item">
-          <div class="d-flex justify-content-between">
+          <div class="d-flex justify-content-between align-items-center">
             <span class="badge bg-{{ despacho.estado_color }}">{{ seg.get_estado_display }}</span>
             <small class="text-muted">{{ seg.fecha|date:"d/m/Y H:i" }} — {{ seg.registrado_por }}</small>
           </div>
           {% if seg.observacion %}<p class="mb-0 mt-1 small">{{ seg.observacion }}</p>{% endif %}
         </div>
         {% empty %}
-        <div class="list-group-item text-muted text-center py-3">Sin historial.</div>
+        <div class="list-group-item text-muted text-center py-3 small">Sin historial.</div>
         {% endfor %}
       </div>
     </div>
   </div>
 
-  <!-- Sidebar info -->
+  <!-- Sidebar -->
   <div class="col-lg-4">
-    <div class="card mb-4">
-      <div class="card-header bg-white"><h5 class="mb-0">Transportista</h5></div>
-      <div class="card-body">
+    <div class="card mb-3">
+      <div class="card-header bg-white fw-semibold">
+        <i class="bi bi-bicycle me-2 text-info"></i>Mensajero
+      </div>
+      <div class="card-body small">
         {% if despacho.transportista %}
           <div class="fw-semibold">{{ despacho.transportista.nombre }}</div>
-          <div class="text-muted small">{{ despacho.transportista.identificacion }}</div>
           {% if despacho.transportista.telefono %}
-          <div class="mt-2"><i class="bi bi-telephone me-1"></i>{{ despacho.transportista.telefono }}</div>
+          <div><i class="bi bi-telephone me-1"></i>{{ despacho.transportista.telefono }}</div>
           {% endif %}
         {% else %}
           <span class="text-muted">No asignado</span>
         {% endif %}
       </div>
     </div>
-    <div class="card mb-4">
-      <div class="card-header bg-white"><h5 class="mb-0">Vehículo</h5></div>
-      <div class="card-body">
-        {% if despacho.vehiculo %}
-          <div class="fw-semibold">{{ despacho.vehiculo.placa }}</div>
-          <div class="text-muted small">{{ despacho.vehiculo.marca }} {{ despacho.vehiculo.modelo }}</div>
-          <div class="small mt-1">Cap: {{ despacho.vehiculo.capacidad_kg }} kg</div>
-        {% else %}
-          <span class="text-muted">No asignado</span>
-        {% endif %}
+    <div class="card mb-3">
+      <div class="card-header bg-white fw-semibold">
+        <i class="bi bi-calendar2 me-2 text-secondary"></i>Fechas
+      </div>
+      <div class="card-body small">
+        <div class="mb-1"><span class="text-muted">Venta:</span> {{ despacho.fecha_despacho|date:"d/m/Y" }}</div>
+        <div><span class="text-muted">Pago:</span> {{ despacho.fecha_pago|date:"d/m/Y"|default:"—" }}</div>
       </div>
     </div>
     <div class="card">
-      <div class="card-header bg-white"><h5 class="mb-0">Registro</h5></div>
+      <div class="card-header bg-white fw-semibold small">Auditoría</div>
       <div class="card-body small text-muted">
-        <div>Creado por: {{ despacho.creado_por|default:"—" }}</div>
+        <div>Creado por: {{ despacho.creado_por|default:"Importado" }}</div>
         <div>Creado: {{ despacho.creado_en|date:"d/m/Y H:i" }}</div>
         <div>Actualizado: {{ despacho.actualizado_en|date:"d/m/Y H:i" }}</div>
+        <div class="mt-2">
+          <a href="{% url 'despachos:eliminar' despacho.pk %}" class="text-danger small">
+            <i class="bi bi-trash me-1"></i>Eliminar despacho
+          </a>
+        </div>
       </div>
     </div>
   </div>

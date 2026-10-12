@@ -16,4 +16,5 @@ urlpatterns = [
     path('vehiculos/', views.lista_vehiculos, name='vehiculos'),
     path('vehiculos/nuevo/', views.crear_vehiculo, name='crear_vehiculo'),
     path('vehiculos/<int:pk>/editar/', views.editar_vehiculo, name='editar_vehiculo'),
+    path('importar/', views.importar_excel, name='importar'),
 ]

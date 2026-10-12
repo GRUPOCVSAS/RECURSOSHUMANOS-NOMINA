@@ -15,7 +15,7 @@ class Transportista(models.Model):
         verbose_name_plural = 'transportistas'
 
     def __str__(self):
-        return f"{self.nombre} ({self.identificacion})"
+        return self.nombre
 
 
 class Vehiculo(models.Model):
@@ -44,25 +44,57 @@ class Despacho(models.Model):
         ('entregado', 'Entregado'),
         ('cancelado', 'Cancelado'),
     ]
+    TIPO_CHOICES = [
+        ('planillas', 'Planillas'),
+        ('reventas', 'Reventas'),
+    ]
 
-    numero = models.CharField(max_length=50, unique=True)
-    fecha_despacho = models.DateField()
-    origen = models.CharField(max_length=200)
-    destino = models.CharField(max_length=200)
-    destinatario = models.CharField(max_length=200)
+    # Identificación
+    numero = models.CharField(max_length=50, unique=True, verbose_name='Contrato')
+    tipo = models.CharField(max_length=20, choices=TIPO_CHOICES, default='planillas')
+
+    # Cliente
+    destinatario = models.CharField(max_length=200, verbose_name='Cliente')
+    celular = models.CharField(max_length=20, blank=True)
+    cedula = models.CharField(max_length=30, blank=True)
+
+    # Dirección y zona
+    origen = models.CharField(max_length=200, blank=True, default='Bodega')
+    destino = models.CharField(max_length=200, verbose_name='Dirección')
+    zona = models.CharField(max_length=200, blank=True)
+
+    # Comercial
+    vendedor1 = models.CharField(max_length=200, blank=True)
+    vendedor2 = models.CharField(max_length=200, blank=True)
+    coordinador_nombre = models.CharField(max_length=200, blank=True, verbose_name='Coordinador')
+
+    # Producto y logística
+    productos_detalle = models.TextField(blank=True, verbose_name='Productos')
     descripcion = models.TextField(blank=True)
     peso_kg = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+
+    # Finanzas
+    valor_venta = models.DecimalField(max_digits=12, decimal_places=2, default=0, verbose_name='Total')
+    saldo = models.DecimalField(max_digits=12, decimal_places=2, default=0, verbose_name='Saldo pendiente')
+
+    # Logística
     estado = models.CharField(max_length=20, choices=ESTADO_CHOICES, default='pendiente')
     transportista = models.ForeignKey(
         Transportista, on_delete=models.SET_NULL, null=True, blank=True,
-        related_name='despachos'
+        related_name='despachos', verbose_name='Mensajero'
     )
     vehiculo = models.ForeignKey(
         Vehiculo, on_delete=models.SET_NULL, null=True, blank=True,
         related_name='despachos'
     )
+
+    # Fechas
+    fecha_despacho = models.DateField(verbose_name='Fecha de venta')
+    fecha_pago = models.DateField(null=True, blank=True, verbose_name='Fecha de pago')
+
+    # Auditoría
     creado_por = models.ForeignKey(
-        User, on_delete=models.SET_NULL, null=True,
+        User, on_delete=models.SET_NULL, null=True, blank=True,
         related_name='despachos_creados'
     )
     creado_en = models.DateTimeField(auto_now_add=True)
@@ -73,7 +105,11 @@ class Despacho(models.Model):
         ordering = ['-fecha_despacho', '-creado_en']
 
     def __str__(self):
-        return f"Despacho {self.numero} - {self.destino}"
+        return f"{self.numero} - {self.destinatario}"
+
+    @property
+    def cobrado(self):
+        return self.valor_venta - self.saldo
 
     @property
     def estado_color(self):
@@ -98,4 +134,4 @@ class SeguimientoDespacho(models.Model):
         ordering = ['-fecha']
 
     def __str__(self):
-        return f"{self.despacho.numero} - {self.get_estado_display()} ({self.fecha:%Y-%m-%d %H:%M})"
+        return f"{self.despacho.numero} - {self.get_estado_display()}"

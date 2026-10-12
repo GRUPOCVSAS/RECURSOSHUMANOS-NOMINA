@@ -3,91 +3,158 @@
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-4">
   <h2 class="fw-bold mb-0">Dashboard</h2>
-  <a href="{% url 'despachos:crear' %}" class="btn btn-primary">
-    <i class="bi bi-plus-lg me-1"></i>Nuevo Despacho
-  </a>
+  <div class="d-flex gap-2">
+    <a href="{% url 'despachos:importar' %}" class="btn btn-outline-success">
+      <i class="bi bi-upload me-1"></i>Importar Excel
+    </a>
+    <a href="{% url 'despachos:crear' %}" class="btn btn-primary">
+      <i class="bi bi-plus-lg me-1"></i>Nuevo Despacho
+    </a>
+  </div>
 </div>
 
-<!-- Estadísticas -->
+<!-- KPIs Financieros -->
 <div class="row g-3 mb-4">
   <div class="col-sm-6 col-xl-3">
     <div class="card stat-card border-primary h-100 p-3">
-      <div class="d-flex justify-content-between align-items-center">
-        <div>
-          <div class="text-muted small">Total Despachos</div>
-          <div class="fs-2 fw-bold">{{ total }}</div>
-        </div>
-        <i class="bi bi-box-seam fs-2 text-primary opacity-50"></i>
-      </div>
-    </div>
-  </div>
-  <div class="col-sm-6 col-xl-3">
-    <div class="card stat-card border-warning h-100 p-3">
-      <div class="d-flex justify-content-between align-items-center">
-        <div>
-          <div class="text-muted small">Pendientes</div>
-          <div class="fs-2 fw-bold text-warning">{{ pendientes }}</div>
-        </div>
-        <i class="bi bi-hourglass-split fs-2 text-warning opacity-50"></i>
-      </div>
-    </div>
-  </div>
-  <div class="col-sm-6 col-xl-3">
-    <div class="card stat-card border-info h-100 p-3">
-      <div class="d-flex justify-content-between align-items-center">
-        <div>
-          <div class="text-muted small">En Tránsito</div>
-          <div class="fs-2 fw-bold text-info">{{ en_transito }}</div>
-        </div>
-        <i class="bi bi-truck fs-2 text-info opacity-50"></i>
-      </div>
+      <div class="text-muted small mb-1">Total Facturado</div>
+      <div class="fs-4 fw-bold text-primary">${{ total_ventas|floatformat:0 }}</div>
+      <div class="text-muted small mt-1">{{ total_registros }} registros</div>
     </div>
   </div>
   <div class="col-sm-6 col-xl-3">
     <div class="card stat-card border-success h-100 p-3">
-      <div class="d-flex justify-content-between align-items-center">
-        <div>
-          <div class="text-muted small">Entregados Hoy</div>
-          <div class="fs-2 fw-bold text-success">{{ entregados_hoy }}</div>
+      <div class="text-muted small mb-1">Cobrado</div>
+      <div class="fs-4 fw-bold text-success">${{ total_cobrado|floatformat:0 }}</div>
+      <div class="mt-2">
+        <div class="progress" style="height:6px">
+          <div class="progress-bar bg-success" style="width:{{ pct_cobrado|floatformat:0 }}%"></div>
         </div>
-        <i class="bi bi-check-circle fs-2 text-success opacity-50"></i>
+        <small class="text-muted">{{ pct_cobrado|floatformat:1 }}% cobrado</small>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-6 col-xl-3">
+    <div class="card stat-card border-danger h-100 p-3">
+      <div class="text-muted small mb-1">Saldo Pendiente</div>
+      <div class="fs-4 fw-bold text-danger">${{ total_saldo|floatformat:0 }}</div>
+      <div class="text-muted small mt-1">por cobrar</div>
+    </div>
+  </div>
+  <div class="col-sm-6 col-xl-3">
+    <div class="card stat-card border-warning h-100 p-3">
+      <div class="text-muted small mb-1">Pendientes despacho</div>
+      <div class="fs-4 fw-bold text-warning">{{ pendientes }}</div>
+      <div class="text-muted small mt-1">{{ en_transito }} en tránsito</div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-4 mb-4">
+  <!-- Top Vendedores -->
+  <div class="col-lg-6">
+    <div class="card h-100">
+      <div class="card-header bg-white fw-semibold">
+        <i class="bi bi-person-check me-2 text-primary"></i>Top Vendedores
+      </div>
+      <div class="card-body p-0">
+        <table class="table table-sm table-hover mb-0">
+          <thead class="table-light"><tr><th>Vendedor</th><th class="text-end">Ventas</th><th class="text-end">Total</th></tr></thead>
+          <tbody>
+            {% for v in top_vendedores %}
+            <tr>
+              <td class="small">{{ v.vendedor1 }}</td>
+              <td class="text-end small">{{ v.cantidad }}</td>
+              <td class="text-end small fw-semibold">${{ v.total|floatformat:0 }}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="3" class="text-center text-muted py-3">Sin datos</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Top Zonas -->
+  <div class="col-lg-6">
+    <div class="card h-100">
+      <div class="card-header bg-white fw-semibold">
+        <i class="bi bi-geo-alt me-2 text-success"></i>Top Zonas
+      </div>
+      <div class="card-body p-0">
+        <table class="table table-sm table-hover mb-0">
+          <thead class="table-light"><tr><th>Zona</th><th class="text-end">Desp.</th><th class="text-end">Total</th></tr></thead>
+          <tbody>
+            {% for z in top_zonas %}
+            <tr>
+              <td class="small">{{ z.zona }}</td>
+              <td class="text-end small">{{ z.cantidad }}</td>
+              <td class="text-end small fw-semibold">${{ z.total|floatformat:0 }}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="3" class="text-center text-muted py-3">Sin datos</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
       </div>
     </div>
   </div>
 </div>
 
-<!-- Últimos despachos -->
-<div class="card">
-  <div class="card-header bg-white d-flex justify-content-between align-items-center">
-    <h5 class="mb-0">Últimos Despachos</h5>
-    <a href="{% url 'despachos:lista' %}" class="btn btn-sm btn-outline-secondary">Ver todos</a>
+<!-- Mensajeros + Últimos despachos -->
+<div class="row g-4">
+  <div class="col-lg-5">
+    <div class="card h-100">
+      <div class="card-header bg-white fw-semibold">
+        <i class="bi bi-bicycle me-2 text-info"></i>Mensajeros
+      </div>
+      <div class="card-body p-0">
+        <table class="table table-sm table-hover mb-0">
+          <thead class="table-light"><tr><th>Mensajero</th><th class="text-end">Cant.</th><th class="text-end">Total</th></tr></thead>
+          <tbody>
+            {% for m in top_mensajeros %}
+            <tr>
+              <td class="small">{{ m.transportista__nombre }}</td>
+              <td class="text-end small">{{ m.cantidad }}</td>
+              <td class="text-end small fw-semibold">${{ m.total|floatformat:0 }}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="3" class="text-center text-muted py-3">Sin datos</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
   </div>
-  <div class="card-body p-0">
-    <div class="table-responsive">
-      <table class="table table-hover mb-0">
-        <thead class="table-light">
-          <tr>
-            <th>Número</th><th>Fecha</th><th>Origen</th><th>Destino</th>
-            <th>Destinatario</th><th>Transportista</th><th>Estado</th><th></th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for d in ultimos %}
-          <tr>
-            <td class="fw-semibold">{{ d.numero }}</td>
-            <td>{{ d.fecha_despacho|date:"d/m/Y" }}</td>
-            <td>{{ d.origen }}</td>
-            <td>{{ d.destino }}</td>
-            <td>{{ d.destinatario }}</td>
-            <td>{{ d.transportista|default:"—" }}</td>
-            <td><span class="badge bg-{{ d.estado_color }}">{{ d.get_estado_display }}</span></td>
-            <td><a href="{% url 'despachos:detalle' d.pk %}" class="btn btn-sm btn-outline-primary">Ver</a></td>
-          </tr>
-          {% empty %}
-          <tr><td colspan="8" class="text-center text-muted py-4">No hay despachos aún.</td></tr>
-          {% endfor %}
-        </tbody>
-      </table>
+
+  <div class="col-lg-7">
+    <div class="card">
+      <div class="card-header bg-white d-flex justify-content-between align-items-center">
+        <span class="fw-semibold"><i class="bi bi-clock-history me-2 text-warning"></i>Últimos Despachos</span>
+        <a href="{% url 'despachos:lista' %}" class="btn btn-sm btn-outline-secondary">Ver todos</a>
+      </div>
+      <div class="card-body p-0">
+        <table class="table table-sm table-hover mb-0">
+          <thead class="table-light">
+            <tr><th>Contrato</th><th>Cliente</th><th>Zona</th><th>Mensajero</th><th class="text-end">Total</th><th>Estado</th></tr>
+          </thead>
+          <tbody>
+            {% for d in ultimos %}
+            <tr style="cursor:pointer" onclick="location.href='{% url 'despachos:detalle' d.pk %}'">
+              <td class="small fw-semibold">{{ d.numero }}</td>
+              <td class="small">{{ d.destinatario|truncatechars:18 }}</td>
+              <td class="small">{{ d.zona|truncatechars:15 }}</td>
+              <td class="small">{{ d.transportista|default:"—"|truncatechars:15 }}</td>
+              <td class="text-end small">${{ d.valor_venta|floatformat:0 }}</td>
+              <td><span class="badge bg-{{ d.estado_color }} small">{{ d.get_estado_display }}</span></td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="6" class="text-center text-muted py-3">Sin despachos aún.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
     </div>
   </div>
 </div>
